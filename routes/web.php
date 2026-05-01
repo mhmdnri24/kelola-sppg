@@ -24,6 +24,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\SupplierController;
+use App\Models\Anggaran;
 use App\Models\Dapur;
 use App\Models\Katalog;
 
@@ -99,5 +100,16 @@ Route::middleware('auth')->group(function () {
 
 
 Route::get('/test', function () {
-    $cart = session()->get('cart', []);
+    $validated = [
+        'dapur_id' => 1,
+        'kategori' => 'SISWA',
+        'active_date' => '2026-05-01',
+        'expire_date' => '2026-05-01'
+    ];
+
+    return Anggaran::where('dapur_id', $validated['dapur_id'])
+        ->where('kategori', $validated['kategori'])
+        ->where('active_date', $validated['active_date'])
+        ->where('expire_date', $validated['expire_date'])
+        ->first();
 });

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\General;
 use App\Models\Anggaran;
+use App\Models\AnggaranHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AnggaranController extends Controller
 {
@@ -37,7 +40,7 @@ class AnggaranController extends Controller
         ];
 
         // $query = Anggaran::query();
-        $query = Anggaran::with('dapur')->scopes('active');
+        $query = Anggaran::with('dapur')->dapur()->active();
 
 
         // 🔍 SEARCH
@@ -128,24 +131,64 @@ class AnggaranController extends Controller
             'pagu_pk' => 'nullable|numeric|min:0',
             'hpp_pb' => 'required|numeric|min:0',
             'hpp_pk' => 'nullable|numeric|min:0',
-            'active_date' => 'nullable|date',
+            'active_date' => 'nullable|date',            
+            'jumlah_hari' => 'nullable|numeric|min:0',
         ]);
 
         $now = now();
         if (empty($validated['active_date'])) {
             $validated['active_date'] = now();
         }
-        $validated['expire_date'] = $now->addDays(7);
+        $validated['expire_date'] = $now->addDays($validated['jumlah_hari']);
+        $existingAnggaran = Anggaran::where('dapur_id', $validated['dapur_id'])
+            ->where('kategori', $validated['kategori'])
+            ->where('active_date', explode(' ', $validated['active_date'])[0])
+            ->where('expire_date', explode(' ', $validated['expire_date'])[0])
+            ->first();
+
+        if ($existingAnggaran) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anggaran dengan tanggal aktif dan tanggal expired yang sama sudah ada untuk dapur ini'
+            ], 422);
+        }
+
+        $pagu = ($validated['pm_pb'] * $validated['pagu_pb']) + ($validated['pm_pk'] * $validated['pagu_pk']);
+        $limit = ($validated['pm_pb'] * $validated['hpp_pb']) + ($validated['pm_pk'] * $validated['hpp_pk']);
+
+        $validated['pagu'] = $pagu;
+        $validated['limit'] = $limit;
+        $validated['anggaran_sisa'] = $limit;
+        $validated['anggaran_terpakai'] = 0;
 
 
         try {
-            Anggaran::create($validated);
+            DB::beginTransaction();
+
+            $anggaran = Anggaran::create($validated);
+
+            AnggaranHistory::insert([                
+                'dapur_id'=>$validated['dapur_id'],
+                'date'=>now(),
+                'trans_type'=>'IN',
+                'status'=>'release',
+                'pagu'=>$pagu,
+                'limit'=>$limit,
+                'module'=>'anggarans',
+                'notes'=>'Create Anggaran',
+                'trans_id'=>$anggaran->id
+            ]);
+
+
+
+             DB::commit();
             return response()->json([
                 'success' => true,
                 'message' => 'Anggaran berhasil ditambahkan',
                 'data' => $validated
-            ]);
+            ]); 
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menambahkan anggaran: ' . $e->getMessage()
@@ -226,12 +269,9 @@ class AnggaranController extends Controller
 
     public function getActiveAnggaranByDapur()
     {
-        $dapur_id = auth()->user()->dapur_id;
-        $anggaran = Anggaran::where('dapur_id', $dapur_id)
-            ->active()
-            ->whereDate('active_date', '<=', now())
-            ->whereDate('expire_date', '>=', now())
-            ->first();
+        $helper = new General();
+
+        $anggaran = $helper->getActiveAnggaranByDapur();
 
         return response()->json($anggaran);
     }

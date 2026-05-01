@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\General;
 use App\Models\Katalog;
+use App\Models\Transaction;
+use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
@@ -58,5 +62,84 @@ class CheckoutController extends Controller
             'recordsFiltered' => count($result),
         ]);
 
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'suppliers' => 'required|array',
+            'grand_total' => 'required|numeric',
+        ]);
+
+        $user = auth()->user();
+        $dapur_id = $user->dapur_id;
+
+        if (!$dapur_id) {
+            return response()->json(['message' => 'User tidak terkait dengan dapur. Tidak dapat melakukan pembelian.'], 403);
+        }
+
+        try {
+
+            $helper = new General();
+
+            $anggaran = $helper->getActiveAnggaranByDapur();
+            
+            DB::beginTransaction();
+
+            $suppliers = $request->suppliers;
+
+            foreach ($suppliers as $supplier) {
+                // Buat transaksi per supplier
+                $noTransaksi = 'PO-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
+
+                $transaction = Transaction::create([
+                    'no_transaksi' => $noTransaksi,
+                    'dapur_id' => $dapur_id,
+                    'supplier_id' => $supplier['supplier_id'],
+                    'tanggal_transaksi' => date('Y-m-d'),
+                    'subtotal' => $supplier['subtotal'],
+                    'status' => 'pending',
+                    'created_by' => $user->id,
+                    'anggaran_id'=>$anggaran->id
+                ]);
+
+                foreach ($supplier['items'] as $item) {
+                    TransactionDetail::create([
+                        'transaction_id' => $transaction->id,
+                        'katalog_id' => $item['katalog_id'],
+                        'qty' => $item['qty'],
+                        'harga' => $item['harga'],
+                        'total' => $item['total'],
+                    ]);
+
+                    // Kurangi stok katalog
+                    $katalog = Katalog::find($item['katalog_id']);
+                    if ($katalog) {
+                        $katalog->stok = $katalog->stok - $item['qty'];
+                        if ($katalog->stok < 0) {
+                            throw new \Exception("Stok tidak mencukupi untuk item " . $katalog->nama);
+                        }
+                        $katalog->save();
+                    }
+                }
+            }
+
+            // Kosongkan keranjang
+            session()->forget('cart');
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Pesanan berhasil dibuat.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

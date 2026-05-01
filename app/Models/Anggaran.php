@@ -27,7 +27,12 @@ class Anggaran extends Model
         'hpp_pk',
         'active_date',
         'expire_date',  
-        'is_active',      
+        'is_active',    
+        'anggaran_terpakai',
+        'anggaran_sisa',
+        'pagu',
+        'limit',
+        'terpakai'
     ];
 
     protected function casts(): array
@@ -49,6 +54,13 @@ class Anggaran extends Model
         return $query->where('status', 'active');
     }
 
+     public function scopeDapur(Builder $query): Builder
+    {
+        $user = auth()->user();
+        return $query->where('dapur_id', $user->dapur_id);
+    }
+
+
     public function dapur(): BelongsTo
     {
         return $this->belongsTo(Dapur::class);
@@ -62,5 +74,13 @@ class Anggaran extends Model
             'pm' => $pm,
             'limit' => $limit
         ];
+    }
+
+    public function transaction(){
+        return $this->hasOne(Transaction::class);
+    }
+
+    public function histories(){
+        return $this->hasMany(AnggaranHistory::class);
     }
 }
