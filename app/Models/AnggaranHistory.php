@@ -11,7 +11,7 @@ class AnggaranHistory extends Model
 
     public $timestamps = true;
 
-    protected $fillable = [       
+    protected $fillable = [
         'date',
         'trans_type',
         'status',
@@ -20,14 +20,17 @@ class AnggaranHistory extends Model
         'limit',
         'module',
         'trans_id',
-        'notes'
+        'notes',
+        'jumlah'
     ];
 
-    public function anggaran(){
+    public function anggaran()
+    {
         return $this->belongsTo(Anggaran::class);
     }
 
-    public function dapur(){
+    public function dapur()
+    {
         return $this->belongsTo(Dapur::class);
     }
 }

@@ -35,15 +35,38 @@
         </div>
 
         <div class="bg-white p-4 rounded-xl shadow">
-            <p class="text-gray-500 text-sm">Terpakai</p>
-            <h2 class="text-xl font-bold text-red-500"> @{{ formatcurrency(anggaran.terpakai) }}</h2>
+            <p class="text-gray-500 text-sm">anggaran_terpakai</p>
+            <h2 class="text-xl font-bold text-red-500"> @{{ formatcurrency(anggaran.anggaran_terpakai) }}</h2>
         </div>
 
         <div class="bg-white p-4 rounded-xl shadow">
-            <p class="text-gray-500 text-sm">Sisa Anggaran</p>
-            <h2 class="text-xl font-bold text-green-600"> @{{ formatcurrency(anggaran.sisa) }}</h2>
+            <p class="text-gray-500 text-sm">anggaran_sisa Anggaran</p>
+            <h2 class="text-xl font-bold text-green-600"> @{{ formatcurrency(anggaran.anggaran_sisa) }}</h2>
         </div>
 
+    </div>
+
+    <div>
+        <h2 class="text-2xl mb-3">Pemakaian Anggaran</h2>
+
+        <table class="min-w-full text-sm text-gray-700">
+            <thead>
+                <tr class="bg-gray-100 text-xs uppercase tracking-wider text-gray-600">
+                    <th class="px-4 py-3 text-left">ID</th>
+                    <th class="px-4 py-3 text-left">Tanggal</th>
+                    <th class="px-4 py-3 text-left">Total</th>
+                    <th class="px-4 py-3 text-left">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="pemakaianAnggaran in pemakaianAngarans">
+                    <td>@{{ pemakaianAnggaran.id }}</td>
+                    <td>@{{ pemakaianAnggaran.tanggal_transaksi }}</td>
+                    <td>@{{ formatcurrency(pemakaianAnggaran.subtotal) }}</td>
+                    <td>@{{ pemakaianAnggaran.status }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <div class="bg-white p-4 rounded-xl shadow mb-6">
@@ -88,9 +111,10 @@
                 anggaran: {
                     pagu: 0,
                     limit: 0,
-                    sisa: 0,
-                    terpakai: 0
-                }
+                    anggaran_sisa: 0,
+                    anggaran_terpakai: 0
+                },
+                pemakaianAngarans: []
 
             }
         },
@@ -110,7 +134,7 @@
         },
         computed: {
             progress() {
-                return (this.anggaran.terpakai / this.anggaran.pagu) * 100
+                return (this.anggaran.anggaran_terpakai / this.anggaran.pagu) * 100
             }
         },
         methods: {
@@ -119,15 +143,17 @@
                 let data = await response.json()
                 // this.anggaran.pagu = (data.pm_pb * data.pagu_pb) + (data.pm_pk * data.pagu_pk)
                 this.anggaran.pagu = (data.pm_pb * data.hpp_pb) + (data.pm_pk * data.hpp_pk) // instead of pagu
-                this.anggaran.sisa = this.anggaran.pagu - this.anggaran.terpakai
+                this.anggaran.anggaran_sisa = data.anggaran_sisa < 1 ? this.anggaran.pagu - this.anggaran.anggaran_terpakai : data.anggaran_sisa;
+                this.anggaran.anggaran_terpakai = data.anggaran_terpakai;
+                this.pemakaianAngarans = data.pemakaian;
 
-                //console.log(this.anggaran, data)
+                console.log(data, 'data')
             },
             async getCartTotal() {
                 let response = await fetch("{{ route('cart.total') }}")
                 let data = await response.json()
-                this.anggaran.terpakai = data
-                this.anggaran.sisa = this.anggaran.pagu - this.anggaran.terpakai
+                this.anggaran.anggaran_terpakai = parseFloat(data) + parseFloat(this.anggaran.anggaran_terpakai);
+                this.anggaran.anggaran_sisa = this.anggaran.pagu - this.anggaran.anggaran_terpakai
 
                 //console.log(this.anggaran, data)
             },
@@ -226,8 +252,8 @@
                     console.log(window.vueInstance)
                     console.log(window.vueInstance.anggaran)
 
-                    if (harga * qty > window.vueInstance.anggaran.sisa) {
-                        Swal.showValidationMessage(`Jumlah tidak boleh melebihi anggaran, anggaran tersedia: ${formatcurrency(window.vueInstance.anggaran.sisa)}`);
+                    if (harga * qty > window.vueInstance.anggaran.anggaran_sisa) {
+                        Swal.showValidationMessage(`Jumlah tidak boleh melebihi anggaran, anggaran tersedia: ${formatcurrency(window.vueInstance.anggaran.anggaran_sisa)}`);
                         return false;
                     }
 

@@ -105,7 +105,7 @@
       <span class="bg-white px-3 py-1 text-green-dark rounded-full text-xs font-semibold" id="cartCount">@{{ cartCount }}</span>
     </a>
     <a href="{{ route("anggaran") }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Angaran</a>
-    <div class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Daftar Pesanan</div>
+    <a href="{{ route("daftar-pesanan") }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Daftar Pesanan</a>
     <div class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Daftar Tagihan</div>
     <a href="{{ route("logout") }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Logout</a>
   </nav>

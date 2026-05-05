@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\General;
 use App\Models\Anggaran;
 use App\Models\AnggaranHistory;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -131,7 +132,7 @@ class AnggaranController extends Controller
             'pagu_pk' => 'nullable|numeric|min:0',
             'hpp_pb' => 'required|numeric|min:0',
             'hpp_pk' => 'nullable|numeric|min:0',
-            'active_date' => 'nullable|date',            
+            'active_date' => 'nullable|date',
             'jumlah_hari' => 'nullable|numeric|min:0',
         ]);
 
@@ -167,26 +168,27 @@ class AnggaranController extends Controller
 
             $anggaran = Anggaran::create($validated);
 
-            AnggaranHistory::insert([                
-                'dapur_id'=>$validated['dapur_id'],
-                'date'=>now(),
-                'trans_type'=>'IN',
-                'status'=>'release',
-                'pagu'=>$pagu,
-                'limit'=>$limit,
-                'module'=>'anggarans',
-                'notes'=>'Create Anggaran',
-                'trans_id'=>$anggaran->id
+            AnggaranHistory::insert([
+                'dapur_id' => $validated['dapur_id'],
+                'date' => now(),
+                'trans_type' => 'IN',
+                'status' => 'release',
+                'pagu' => $pagu,
+                'limit' => $limit,
+                'module' => 'anggarans',
+                'notes' => 'Create Anggaran',
+                'trans_id' => $anggaran->id,
+                'jumlah' => $limit
             ]);
 
 
 
-             DB::commit();
+            DB::commit();
             return response()->json([
                 'success' => true,
                 'message' => 'Anggaran berhasil ditambahkan',
                 'data' => $validated
-            ]); 
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -272,6 +274,7 @@ class AnggaranController extends Controller
         $helper = new General();
 
         $anggaran = $helper->getActiveAnggaranByDapur();
+        $anggaran->pemakaian = Transaction::where('anggaran_id', $anggaran->id)->get();
 
         return response()->json($anggaran);
     }

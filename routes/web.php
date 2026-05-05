@@ -22,6 +22,7 @@ Route::get('/', function () {
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\DaftarPesananController;
 use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\SupplierController;
 use App\Models\Anggaran;
@@ -59,6 +60,13 @@ Route::middleware('auth')->group(function () {
 
     // supplier
     Route::get('/supplier/data', [SupplierController::class, 'getSupplier'])->name('suppliers.data');
+
+    // daftar-pesanan
+    Route::get('/daftar-pesanan', [DaftarPesananController::class, 'index'])->name('daftar-pesanan');
+    Route::get('/daftar-pesanan/data', [DaftarPesananController::class, 'data'])->name('daftar-pesanan.data');
+    Route::get('/daftar-pesanan/{id}', [DaftarPesananController::class, 'show'])->name('daftar-pesanan.show');
+    Route::post('/daftar-pesanan/{id}/update-status', [DaftarPesananController::class, 'updateStatus'])->name('daftar-pesanan.update-status');
+
 
 
     Route::prefix('admin')->middleware('role:admin')->group(function () {});
