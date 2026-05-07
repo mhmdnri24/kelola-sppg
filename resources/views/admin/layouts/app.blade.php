@@ -133,7 +133,7 @@
     </a>
 
     @if(auth()->user()->hasAnyRole('dapur|admin'))
-    <a href="#" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Daftar Tagihan</a>
+    <a href="{{ route('tagihan') }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Daftar Tagihan</a>
     @endif
 
     <a href="{{ route("logout") }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Logout</a>

@@ -15,6 +15,7 @@ class TransactionDetail extends Model
         'qty',
         'harga',
         'total',
+        'keterangan',
     ];
 
     public function transaction()

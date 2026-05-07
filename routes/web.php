@@ -65,9 +65,18 @@ Route::middleware('auth')->group(function () {
 
     // daftar-pesanan
     Route::get('/daftar-pesanan', [DaftarPesananController::class, 'index'])->name('daftar-pesanan');
+    Route::get('/tagihan', [DaftarPesananController::class, 'tagihan'])->name('tagihan');
     Route::get('/daftar-pesanan/data', [DaftarPesananController::class, 'data'])->name('daftar-pesanan.data');
+    Route::get('/daftar-tagihan/data', [DaftarPesananController::class, 'dataTagihan'])->name('daftar-tagihan.data');
     Route::get('/daftar-pesanan/{id}', [DaftarPesananController::class, 'show'])->name('daftar-pesanan.show');
     Route::post('/daftar-pesanan/{id}/update-status', [DaftarPesananController::class, 'updateStatus'])->name('daftar-pesanan.update-status');
+
+    // Supplier specific routes
+    Route::middleware('role:supplier')->group(function () {
+        Route::get('/daftar-pesanan/{id}/edit-supplier', [DaftarPesananController::class, 'editSupplier'])->name('daftar-pesanan.edit-supplier');
+        Route::put('/daftar-pesanan/{id}/update-supplier', [DaftarPesananController::class, 'updateSupplier'])->name('daftar-pesanan.update-supplier');
+        Route::post('/daftar-pesanan/{id}/update-status-supplier', [DaftarPesananController::class, 'updateStatusSupplier'])->name('daftar-pesanan.update-status-supplier');
+    });
 
 
 

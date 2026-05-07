@@ -58,6 +58,9 @@
                         <th scope="col" class="px-6 py-3 font-medium text-right">Harga</th>
                         <th scope="col" class="px-6 py-3 font-medium text-center">Qty</th>
                         <th scope="col" class="px-6 py-3 font-medium text-right">Total</th>
+                        @if ($transaction->details->first()?->keterangan)
+                        <th scope="col" class="px-6 py-3 font-medium">Keterangan</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -70,6 +73,9 @@
                         <td class="px-6 py-4 whitespace-nowrap text-right">Rp {{ number_format($detail->harga, 0, ',', '.') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">{{ $detail->qty }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-gray-900">Rp {{ number_format($detail->total, 0, ',', '.') }}</td>
+                        @if ($transaction->details->first()?->keterangan)
+                        <td class="px-6 py-4 text-sm text-gray-700">{{ $detail->keterangan }}</td>
+                        @endif
                     </tr>
                     @empty
                     <tr>
@@ -83,6 +89,9 @@
                     <tr>
                         <th colspan="4" class="px-6 py-4 text-right text-sm font-bold text-gray-900">Grand Total</th>
                         <th class="px-6 py-4 text-right text-sm font-bold text-green-700">Rp {{ number_format($transaction->subtotal, 0, ',', '.') }}</th>
+                        @if ($transaction->details->first()?->keterangan)
+                        <th></th>
+                        @endif
                     </tr>
                 </tfoot>
             </table>
@@ -91,6 +100,18 @@
         <div class="flex justify-end gap-2 py-5">
             <button @click="reject()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Tolak</button>
             <button @click="approve()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">Setujui</button>
+        </div>
+        @elseif ($transaction->status == 'diproses' && auth()->user()->hasRole('supplier') && $transaction->supplier_id == auth()->user()->supplier_id)
+        <div class="flex justify-end gap-2 py-5 px-6 pb-6">
+            <a href="{{ route('daftar-pesanan.edit-supplier', $transaction->id) }}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Edit & Kelola Pesanan</a>
+        </div>
+        @elseif ($transaction->status == 'dikirim' && auth()->user()->hasRole('dapur'))
+        <div class="flex justify-end gap-2 py-5 px-6 pb-6">
+            <button @click="terima()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">Terima</button>
+        </div>
+         @elseif ($transaction->status == 'selesai' && auth()->user()->hasAnyRole('dapur|admin'))
+        <div class="flex justify-end gap-2 py-5 px-6 pb-6">
+            <button @click="pelunasan()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">Konfirmasi Pelunasan</button>
         </div>
         @endif
     </div>
@@ -115,8 +136,20 @@
             },
 
             async approve() {
-                try {
+                const result = await Swal.fire({
+                    title: 'Setujui Pesanan?',
+                    text: 'Apakah Anda yakin ingin menyetujui pesanan ini?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Setujui',
+                    cancelButtonText: 'Batal'
+                });
 
+                if (!result.isConfirmed) return;
+
+                try {
                     const response = await fetch(`/daftar-pesanan/${this.id}/update-status`, {
                         method: 'POST',
                         headers: {
@@ -141,10 +174,29 @@
                     }
                 } catch (error) {
                     console.error(error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat menyetujui pesanan',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
                 }
             },
 
             async reject() {
+                const result = await Swal.fire({
+                    title: 'Tolak Pesanan?',
+                    text: 'Apakah Anda yakin ingin menolak pesanan ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Tolak',
+                    cancelButtonText: 'Batal'
+                });
+
+                if (!result.isConfirmed) return;
+
                 try {
                     const response = await fetch(`/daftar-pesanan/${this.id}/update-status`, {
                         method: 'POST',
@@ -159,7 +211,6 @@
 
                     const data = await response.json();
                     if (data.status === 'success') {
-
                         Swal.fire({
                             title: 'Transaksi berhasil ditolak!',
                             icon: 'success',
@@ -167,13 +218,112 @@
                             allowOutsideClick: false,
                             allowEscapeKey: false
                         });
-
                         window.location.reload()
                     }
                 } catch (error) {
                     console.error(error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat menolak pesanan',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
                 }
-            }
+            },
+            async terima() {
+                const result = await Swal.fire({
+                    title: 'Terima Pesanan?',
+                    text: 'Apakah Anda yakin pesanan ini sudah diterima lengkap?',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Terima',
+                    cancelButtonText: 'Batal'
+                });
+
+                if (!result.isConfirmed) return;
+
+                try {
+                    const response = await fetch(`/daftar-pesanan/${this.id}/update-status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        },
+                        body: JSON.stringify({
+                            status: 'selesai',
+                        }),
+                    });
+
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            title: 'Transaksi berhasil diselesaikan!',
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false
+                        });
+                        window.location.reload()
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat menerima pesanan',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+             async pelunasan() {
+                const result = await Swal.fire({
+                    title: 'Konfirmasi Pelunasan?',
+                    text: 'Apakah Anda yakin pesanan ini sudah dilunasi?',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Terima',
+                    cancelButtonText: 'Batal'
+                });
+
+                if (!result.isConfirmed) return;
+
+                try {
+                    const response = await fetch(`/daftar-pesanan/${this.id}/update-status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        },
+                        body: JSON.stringify({
+                            status: 'lunas',
+                        }),
+                    });
+
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            title: 'Pelunasan berhasil dikonfirmasi!',
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false
+                        });
+                        window.location.reload()
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat mengkonfirmasi pelunasan',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
 
         }
     }).mount('#app')

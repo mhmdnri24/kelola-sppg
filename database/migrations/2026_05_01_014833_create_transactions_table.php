@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('restrict');
             $table->date('tanggal_transaksi');
             $table->decimal('subtotal', 15, 2)->default(0);
-            $table->enum('status', ['pending', 'ditolak', 'diproses', 'dikirim', 'selesai', 'dibatalkan'])->default('pending');
+            $table->enum('status', ['pending', 'ditolak', 'diproses', 'dikirim', 'selesai','lunas', 'dibatalkan'])->default('pending');
             $table->foreignId('created_by')->constrained('users')->onDelete('restrict');
             $table->timestamps();
         });
