@@ -38,6 +38,11 @@
         <textarea :class="getFieldClass('deskripsi')" placeholder="Input deskripsi..." v-model="form.deskripsi" rows="4"></textarea>
     </div>
 
+      <div class="mb-6">
+       <input type="checkbox" id="is_terbit" v-model="form.is_terbit" class="mr-2 leading-tight">
+       <label for="is_terbit" class="text-sm text-gray-700">Terbitkan Katalog</label>
+    </div>
+
     <div class="flex justify-end gap-3">
         <button @click="handleSave" class="bg-green-main hover:bg-green-light text-white border-0 rounded-lg px-5 py-2.5 text-sm font-semibold cursor-pointer flex items-center gap-2 shadow-[0_2px_8px_rgba(40,167,69,0.35)] transition-all hover:-translate-y-px">
             Save
@@ -61,6 +66,7 @@
                     harga: '',
                     stok: '',
                     deskripsi: '',
+                    is_terbit: true
                 },
                 errors: {},
                 rules: {
@@ -152,6 +158,7 @@
                     harga: '{{ $katalog->harga }}',
                     stok: '{{ $katalog->stok }}',
                     deskripsi: '{{ $katalog->deskripsi }}',
+                    is_terbit: {{ $katalog->is_terbit ? 'true' : 'false' }}
                 };
                 @endif
             },

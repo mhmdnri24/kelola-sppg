@@ -20,14 +20,25 @@ class KatalogController extends Controller
         return view('admin.katalog.index', $payload);
     }
 
+        public function etalase()
+    {
+        $payload = [
+            'title' => 'Etalase',
+            'breadcrumbs' => [
+                ['name' => 'Dashboard', 'url' => route('dashboard')],
+                ['name' => 'Etalase', 'url' => route('katalog.etalase')],
+            ]
+        ];
+        return view('admin.katalog.etalase', $payload);
+    }
 
 
 
-    public function data(Request $request)
+    public function dataEtalase(Request $request)
     {
         $columns = ['id', 'nama', 'supplier_id', 'harga', 'stok'];
 
-        $query = Katalog::with('supplier');
+        $query = Katalog::with('supplier')->where('is_terbit', true);
 
         // 🔍 SEARCH
         if ($search = $request->input('search.value')) {
@@ -79,6 +90,75 @@ class KatalogController extends Controller
                 </button>
                 ' : '') . '
                 ' . ($manage ? '
+                
+                ' : '') . '
+                ' . ($manage ? '
+                
+                ' : '') . '
+                </div>
+     '
+            ];
+        }
+
+        return response()->json([
+            "draw" => intval($request->draw),
+            "recordsTotal" => $recordsTotal,
+            "recordsFiltered" => $recordsFiltered,
+            "data" => $result,
+        ]);
+    }
+    public function data(Request $request)
+    {
+        $columns = ['id', 'nama', 'supplier_id', 'harga', 'stok'];
+
+        $query = Katalog::with('supplier');
+
+        // 🔍 SEARCH
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                    ->orWhere('supplier_id', 'like', "%{$search}%");
+            });
+        }
+
+        // 📊 TOTAL
+        $recordsTotal = Katalog::count();
+        $recordsFiltered = $query->count();
+
+        // 🔃 ORDER
+        if ($request->has('order')) {
+            $orderColIndex = $request->input('order.0.column');
+            $orderDir = $request->input('order.0.dir');
+
+            $query->orderBy($columns[$orderColIndex], $orderDir);
+        }
+
+        // 📄 PAGINATION
+        $data = $query
+            ->skip($request->start)
+            ->take($request->length)
+            ->get();
+
+        $user = Auth()->user();
+
+        $manage = $user->hasAnyPermission(['manage katalog']);
+        $pilihItem = $user->hasAnyRole(['dapur']);
+        $result = [];
+        foreach ($data as $item) {
+            $result[] = [
+                $item->id,
+                $item->nama,
+                $item->supplier->name ?? 'N/A',
+                'Rp ' . number_format($item->harga, 0, ',', '.'),
+                $item->stok,
+                '
+
+
+                <div class="flex items-center gap-2">
+                ' . ($pilihItem ? '
+                
+                ' : '') . '
+                ' . ($manage ? '
                 <button class="flex justify-center items-center btn-edit px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 text-xs" data-id="' . $item->id . '">
                     <span>Edit</span>
                 </button>
@@ -122,6 +202,7 @@ class KatalogController extends Controller
             'supplier_id' => 'required|numeric',
             'harga' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
+            'is_terbit' => 'nullable|boolean',
         ]);
 
         try {
@@ -164,6 +245,7 @@ class KatalogController extends Controller
             'supplier_id' => 'required|numeric',
             'harga' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
+            'is_terbit' => 'nullable|boolean',
         ]);
 
         try {

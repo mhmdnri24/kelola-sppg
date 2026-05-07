@@ -185,7 +185,7 @@
         let table = $('#table-katalog').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('katalog.data') }}",
+            ajax: "{{ route('katalog.etalase') }}",
             columns: [{
                     data: 0
                 },

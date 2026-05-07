@@ -13,14 +13,12 @@ return new class extends Migration
     {
         //
         Schema::table('users', function (Blueprint $table) {
-           $table->enum('user_type', ['admin', 'dapur','supplier'])->default('admin')->after('email');
-           $table->unsignedBigInteger('supplier_id')->nullable()->after('user_type');
-           $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
+            $table->enum('user_type', ['admin', 'dapur', 'supplier'])->default('admin')->after('email');
+            $table->unsignedBigInteger('supplier_id')->nullable()->after('user_type');
+            $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
 
-           $table->unsignedBigInteger('dapur_id')->nullable()->after('user_type');
-           $table->foreign('dapur_id')->references('id')->on('dapurs')->onDelete('cascade');
-
-
+            $table->unsignedBigInteger('dapur_id')->nullable()->after('user_type');
+            $table->foreign('dapur_id')->references('id')->on('dapurs')->onDelete('cascade');
         });
     }
 

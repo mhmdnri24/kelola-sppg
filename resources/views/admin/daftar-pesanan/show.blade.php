@@ -87,7 +87,7 @@
                 </tfoot>
             </table>
         </div>
-        @if ($transaction->status == 'pending')
+        @if ($transaction->status == 'pending' && auth()->user()->hasAnyRole('admin'))
         <div class="flex justify-end gap-2 py-5">
             <button @click="reject()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Tolak</button>
             <button @click="approve()" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">Setujui</button>

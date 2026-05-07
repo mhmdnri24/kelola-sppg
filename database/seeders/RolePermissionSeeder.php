@@ -80,7 +80,6 @@ class RolePermissionSeeder extends Seeder
             'view dashboard',
             'view reports',
             'view katalog',
-            'manage katalog',
             'view keranjang',
             'manage keranjang',
             'view daftar pesanan',

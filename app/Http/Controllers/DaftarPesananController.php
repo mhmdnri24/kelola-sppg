@@ -35,7 +35,20 @@ class DaftarPesananController extends Controller
             'status',
         ];
 
+
         $query = Transaction::with(['dapur', 'supplier', 'anggaran']);
+
+        if (auth()->user()->hasRole('dapur')) {
+            $query->where('dapur_id', auth()->user()->dapur_id);
+        }
+
+        if (auth()->user()->hasRole('supplier')) {
+            $query->where('supplier_id', auth()->user()->supplier_id)->whereIn('status', [
+                'diproses',
+                'dikirim',
+                'selesai',
+            ]);
+        }
 
         // 🔍 SEARCH
         if ($search = $request->input('search.value')) {

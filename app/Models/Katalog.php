@@ -15,6 +15,7 @@ class Katalog extends Model
         'supplier_id',
         'harga',
         'stok',
+        'is_terbit'
     ];
 
     public function supplier()

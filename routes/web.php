@@ -51,12 +51,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/katalog/data', [KatalogController::class, 'data'])->name('katalog.data');
+    Route::get('/katalog/etalase', [KatalogController::class, 'dataEtalase'])->name('katalog.etalase');
     Route::get('/katalog/create', [KatalogController::class, 'create'])->name('katalog.create');
     Route::post('/katalog', [KatalogController::class, 'store'])->name('katalog.store');
     Route::get('/katalog/{id}/edit', [KatalogController::class, 'edit'])->name('katalog.edit');
     Route::put('/katalog/{id}', [KatalogController::class, 'update'])->name('katalog.update');
     Route::delete('/katalog/{id}', [KatalogController::class, 'destroy'])->name('katalog.destroy');
     Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
+    Route::get('/etalase', [KatalogController::class, 'etalase'])->name('etalase');
 
     // supplier
     Route::get('/supplier/data', [SupplierController::class, 'getSupplier'])->name('suppliers.data');
