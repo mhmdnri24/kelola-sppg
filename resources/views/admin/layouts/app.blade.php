@@ -136,6 +136,10 @@
     <a href="{{ route('tagihan') }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Daftar Tagihan</a>
     @endif
 
+    @if(auth()->user()->hasAnyRole('admin'))
+    <a href="{{ route('daftar-rekening') }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Daftar Rekening</a>
+    @endif
+
     <!-- Dropdown Laporan -->
     <div class="relative group">
         <button class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">

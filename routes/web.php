@@ -25,6 +25,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DaftarPesananController;
 use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\BankAccountController;
 use App\Models\Anggaran;
 use App\Models\Dapur;
 use App\Models\Katalog;
@@ -77,6 +78,16 @@ Route::middleware('auth')->group(function () {
         Route::put('/daftar-pesanan/{id}/update-supplier', [DaftarPesananController::class, 'updateSupplier'])->name('daftar-pesanan.update-supplier');
         Route::post('/daftar-pesanan/{id}/update-status-supplier', [DaftarPesananController::class, 'updateStatusSupplier'])->name('daftar-pesanan.update-status-supplier');
     });
+
+    // daftar-rekening
+    Route::get('/daftar-rekening', [BankAccountController::class, 'index'])->name('daftar-rekening');
+    Route::get('/daftar-rekening/data', [BankAccountController::class, 'data'])->name('daftar-rekening.data');
+    Route::get('/daftar-rekening/create', [BankAccountController::class, 'create'])->name('daftar-rekening.create');
+    Route::post('/daftar-rekening', [BankAccountController::class, 'store'])->name('daftar-rekening.store');
+    Route::get('/daftar-rekening/{id}', [BankAccountController::class, 'show'])->name('daftar-rekening.show');
+    Route::get('/daftar-rekening/{id}/edit', [BankAccountController::class, 'edit'])->name('daftar-rekening.edit');
+    Route::put('/daftar-rekening/{id}', [BankAccountController::class, 'update'])->name('daftar-rekening.update');
+    Route::delete('/daftar-rekening/{id}', [BankAccountController::class, 'destroy'])->name('daftar-rekening.destroy');
 
 
 
