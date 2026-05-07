@@ -136,6 +136,53 @@
     <a href="{{ route('tagihan') }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Daftar Tagihan</a>
     @endif
 
+    <!-- Dropdown Laporan -->
+    <div class="relative group">
+        <button class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">
+            Laporan
+            <svg class="w-4 h-4 ml-1 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+        </button>
+        
+        <!-- Dropdown Menu -->
+        <div class="hidden group-hover:block absolute top-full left-0 mt-0 bg-green-dark rounded-b-lg shadow-lg z-50 min-w-48">
+            <a href="#" class="block px-4 py-3 text-[13px] text-white/90 hover:bg-green-mid hover:text-white border-b border-green-mid/30 transition-colors">
+                <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Laporan Transaksi
+                </span>
+            </a>
+            <a href="#" class="block px-4 py-3 text-[13px] text-white/90 hover:bg-green-mid hover:text-white border-b border-green-mid/30 transition-colors">
+                <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Laporan Pembelian
+                </span>
+            </a>
+            <a href="#" class="block px-4 py-3 text-[13px] text-white/90 hover:bg-green-mid hover:text-white border-b border-green-mid/30 transition-colors">
+                <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Bayar Supplier
+                </span>
+            </a>
+            <a href="#" class="block px-4 py-3 text-[13px] text-white/90 hover:bg-green-mid hover:text-white border-b border-green-mid/30 transition-colors">
+                <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Laporan Penjualan
+                </span>
+            </a>
+            
+        </div>
+    </div>
+
     <a href="{{ route("logout") }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Logout</a>
   </nav>
 
