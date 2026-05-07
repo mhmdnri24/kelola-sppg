@@ -20,6 +20,7 @@
 </a>
 @endsection
 
+@if(auth()->user()->hasAnyRole('dapur|admin'))
 <div class="p-6 bg-white mb-3" id="app">
 
     <div class="mb-6">
@@ -78,6 +79,7 @@
     </div>
 
 </div>
+@endif
 
 
 <!-- 📊 TABLE -->

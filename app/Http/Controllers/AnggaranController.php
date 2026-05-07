@@ -6,6 +6,7 @@ use App\Helpers\General;
 use App\Models\Anggaran;
 use App\Models\AnggaranHistory;
 use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -83,6 +84,8 @@ class AnggaranController extends Controller
                 'Rp ' . number_format($item->pagu_pk, 0, ',', '.'),
                 'Rp ' . number_format($item->hpp_pb, 0, ',', '.'),
                 'Rp ' . number_format($item->hpp_pk, 0, ',', '.'),
+                $item->active_date,
+                $item->expire_date,
                 '
                 <div class="flex items-center gap-2">
                 <button class="flex justify-center items-center btn-edit px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 text-xs" data-id="' . $item->id . '">
@@ -201,6 +204,8 @@ class AnggaranController extends Controller
     public function edit($id)
     {
         $anggaran = Anggaran::findOrFail($id);
+
+        $anggaran->jumlah_hari = Carbon::parse($anggaran->active_date)->diffInDays($anggaran->expire_date);
 
         $payload = [
             'title' => 'Edit Anggaran',

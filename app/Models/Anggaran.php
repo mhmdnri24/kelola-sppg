@@ -15,7 +15,7 @@ class Anggaran extends Model
 
     protected $fillable = [
         'id',
-        'dapur_id',        
+        'dapur_id',
         'location',
         'kategori',
         'nama_anggaran',
@@ -26,8 +26,8 @@ class Anggaran extends Model
         'hpp_pb',
         'hpp_pk',
         'active_date',
-        'expire_date',  
-        'is_active',    
+        'expire_date',
+        'is_active',
         'anggaran_terpakai',
         'anggaran_sisa',
         'pagu',
@@ -45,16 +45,16 @@ class Anggaran extends Model
             'hpp_pb' => 'decimal:2',
             'hpp_pk' => 'decimal:2',
             'active_date' => 'date',
-            'expire_date' => 'date',            
+            'expire_date' => 'date',
         ];
     }
 
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('status', 'active');
+        return $query->where('status', 'active')->where('expire_date', '>=', today());
     }
 
-     public function scopeDapur(Builder $query): Builder
+    public function scopeDapur(Builder $query): Builder
     {
         $user = auth()->user();
         return $query->where('dapur_id', $user->dapur_id);
@@ -76,11 +76,13 @@ class Anggaran extends Model
         ];
     }
 
-    public function transaction(){
+    public function transaction()
+    {
         return $this->hasOne(Transaction::class);
     }
 
-    public function histories(){
+    public function histories()
+    {
         return $this->hasMany(AnggaranHistory::class);
     }
 }

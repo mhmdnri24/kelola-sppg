@@ -30,22 +30,22 @@ class RolePermissionSeeder extends Seeder
             'update users',
             'delete users',
             'manage users',
-            
+
             // Role permissions
             'view roles',
             'create roles',
             'update roles',
             'delete roles',
             'manage roles',
-            
+
             // Permission permissions
             'view permissions',
             'manage permissions',
-            
+
             // Dashboard
             'view dashboard',
             'view reports',
-            
+
             // General
             'view settings',
             'update settings',
@@ -91,6 +91,7 @@ class RolePermissionSeeder extends Seeder
         $viewerRole->syncPermissions([
             'view dashboard',
             'view katalog',
+            'manage katalog',
         ]);
     }
 }

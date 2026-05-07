@@ -13,16 +13,16 @@
 </style>
 @endsection
 @section('header_actions')
-    <a href="{{ route('anggaran.create') }}" class="bg-green-main hover:bg-green-light text-white border-0 rounded-lg px-5 py-2.5 text-sm font-semibold cursor-pointer flex items-center gap-2 shadow-[0_2px_8px_rgba(40,167,69,0.35)] transition-all hover:-translate-y-px">
-        <span class="text-lg font-normal">+</span> New
-    </a>
+<a href="{{ route('anggaran.create') }}" class="bg-green-main hover:bg-green-light text-white border-0 rounded-lg px-5 py-2.5 text-sm font-semibold cursor-pointer flex items-center gap-2 shadow-[0_2px_8px_rgba(40,167,69,0.35)] transition-all hover:-translate-y-px">
+    <span class="text-lg font-normal">+</span> New
+</a>
 @endsection
-@section('content') 
+@section('content')
 <div class="bg-white p-4 rounded shadow">
     <table id="table-anggaran" class="min-w-full text-sm text-gray-700">
         <thead>
             <tr class="bg-gray-100 text-xs uppercase tracking-wider text-gray-600">
-                <th class="px-4 py-3 text-left">ID</th>                
+                <th class="px-4 py-3 text-left">ID</th>
                 <th class="px-4 py-3 text-left">Kategori</th>
                 <th class="px-4 py-3 text-left">Nama Anggaran</th>
                 <th class="px-4 py-3 text-left">PM PB</th>
@@ -31,6 +31,8 @@
                 <th class="px-4 py-3 text-left">Pagu PK</th>
                 <th class="px-4 py-3 text-left">HPP PB</th>
                 <th class="px-4 py-3 text-left">HPP PK</th>
+                <th class="px-4 py-3 text-left">Tanggal Mulai Aktif</th>
+                <th class="px-4 py-3 text-left">Tanggal Berakhir</th>
                 <th class="px-4 py-3 text-left">ACTION</th>
             </tr>
         </thead>
@@ -80,9 +82,15 @@
                 {
                     data: 8
                 },
-                
                 {
-                    data: 9,
+                    data: 9
+                },
+                {
+                    data: 10
+                },
+
+                {
+                    data: 11,
                     orderable: false,
                     searchable: false
                 }
@@ -99,7 +107,7 @@
         // Delete button handler
         $(document).on('click', '.btn-delete', function() {
             let id = $(this).data('id');
-            
+
             Swal.fire({
                 title: 'Apakah Anda yakin?',
                 text: 'Data akan dihapus dan tidak dapat dikembalikan!',
@@ -112,37 +120,37 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch(`/dapur/anggaran/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire(
+                                    'Terhapus!',
+                                    data.message,
+                                    'success'
+                                ).then(() => {
+                                    table.ajax.reload();
+                                });
+                            } else {
+                                Swal.fire(
+                                    'Gagal!',
+                                    data.message,
+                                    'error'
+                                );
+                            }
+                        })
+                        .catch(error => {
                             Swal.fire(
-                                'Terhapus!',
-                                data.message,
-                                'success'
-                            ).then(() => {
-                                table.ajax.reload();
-                            });
-                        } else {
-                            Swal.fire(
-                                'Gagal!',
-                                data.message,
+                                'Error!',
+                                error.message,
                                 'error'
                             );
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire(
-                            'Error!',
-                            error.message,
-                            'error'
-                        );
-                    });
+                        });
                 }
             });
         });

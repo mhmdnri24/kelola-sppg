@@ -31,6 +31,8 @@ return new class extends Migration
     {
         //
         Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['supplier_id']);
+            $table->dropForeign(['dapur_id']);
             $table->dropColumn('user_type');
             $table->dropColumn('supplier_id');
             $table->dropColumn('dapur_id');

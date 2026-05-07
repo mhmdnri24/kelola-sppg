@@ -101,10 +101,17 @@
   <nav class="bg-green-nav flex items-stretch px-5 gap-0.5">
     <a href="{{ route("dashboard") }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Halaman Utama</a>
     <a href="{{ route("katalog") }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">E-Katalog</a>
+
+    @if(auth()->user()->hasAnyRole('dapur|admin'))
+
     <a href="{{ route("keranjang") }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Keranjang
       <span class="bg-white px-3 py-1 text-green-dark rounded-full text-xs font-semibold" id="cartCount">@{{ cartCount }}</span>
     </a>
     <a href="{{ route("anggaran") }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Angaran</a>
+
+
+    @endif
+
     <a href="{{ route("daftar-pesanan") }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Daftar Pesanan</a>
     <div class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Daftar Tagihan</div>
     <a href="{{ route("logout") }}" class="px-4 h-11 flex items-center gap-1 text-[13.5px] font-medium text-white/90 rounded-t cursor-pointer hover:bg-white/10 transition-colors">Logout</a>
